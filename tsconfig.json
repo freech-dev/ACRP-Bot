@@ -1,0 +1,29 @@
+{
+	"types": [
+		"node"
+	],
+	"extends": "@smol-code/tsconfig",
+	"compilerOptions": {
+		"ignoreDeprecations": "5.0",
+		"outDir": "./build",
+		"baseUrl": "./src",
+		"skipLibCheck": true,
+		"target": "ES2018",
+		"strictPropertyInitialization": false,
+		"inlineSourceMap": true,
+		"resolveJsonModule": true,
+		"esModuleInterop": true,
+		"module": "CommonJS",
+		"moduleResolution": "node",
+		"moduleDetection": "auto",
+		"emitDecoratorMetadata": true,
+		"experimentalDecorators": true,
+	},
+	"include": [
+		"**/*",
+	],
+	"exclude": [
+		"node_modules",
+		"build"
+	],
+}
