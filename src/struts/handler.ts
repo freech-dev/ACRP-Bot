@@ -10,7 +10,6 @@ export class Handler {
 
     constructor(client: OceanBubble) {
         this.client = client;
-        this.messageSent = false;
 
         this.loadCommands().then(() => this.client.logger.info(`Loaded ${this.client.commands.size} commands.`)).catch((err) => console.log(err));
         this.loadListeners().then(() => this.client.logger.info(`Loaded Listeners.`));
@@ -91,11 +90,12 @@ export class Handler {
 
         if(commandArgs) {
             const command: Command | undefined = this.fetchCommand(commandArgs);
-
+            let msgSent = false;
+            
             if(command){   
-                if(this.messageSent === false) {
+                if(msgSent === false) {
                     this.client.rest.channels.createMessage(msg.channelID, { content:"Please Bare with us! this is a work in progress! for now use / commands." });
-                    this.messageSent = true;
+                    msgSent = true;
                 }
             }
         }        
