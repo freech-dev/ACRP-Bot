@@ -1,4 +1,4 @@
-import { CommandInteraction, Constants, Message } from "oceanic.js";
+import { AnyTextableChannel, CommandInteraction, Message, Uncached } from "oceanic.js";
 import { CommandOptions } from "./types";
 import { OceanBubble } from "./oceanicbubble";
 

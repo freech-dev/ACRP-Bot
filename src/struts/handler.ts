@@ -1,16 +1,21 @@
 import { OceanBubble } from "./oceanicbubble";
 import { Command } from "./command";
+import Listener from "./listener";
 import * as glob from 'glob';
-import { AnyInteractionGateway, Constants } from "oceanic.js";
+import { AnyInteractionGateway, AnyTextableChannel, Constants, Message, Uncached } from "oceanic.js";
 
 export class Handler {
     protected client: OceanBubble;
+    private messageSent: boolean;
 
     constructor(client: OceanBubble) {
         this.client = client;
+        this.messageSent = false;
 
         this.loadCommands().then(() => this.client.logger.info(`Loaded ${this.client.commands.size} commands.`)).catch((err) => console.log(err));
+        this.loadListeners().then(() => this.client.logger.info(`Loaded Listeners.`));
         this.client.on('interactionCreate', this.handleInteraction.bind(this));
+        this.client.on('messageCreate', this.handlePrefix.bind(this));
     }
 
     public async loadCommands() {
@@ -40,7 +45,7 @@ export class Handler {
         await Promise.all(promises)
     }
 
-    private fetchCommand(commandName: string) {
+    public fetchCommand(commandName: string) {
         return this.client.commands.get(commandName) || this.client.commands.get(this.client.alias.get(commandName) as string);
     }
 
@@ -76,5 +81,42 @@ export class Handler {
                 command.messageContext(interaction);
                 break;
         }
+    }
+
+    public async handlePrefix(msg: Message<AnyTextableChannel | Uncached>) {
+        if(msg.content === undefined) return;
+
+        const prefix = "!"
+        const commandArgs = msg.content.slice(prefix.length).trim().split(/ + /).shift();
+
+        if(commandArgs) {
+            const command: Command | undefined = this.fetchCommand(commandArgs);
+
+            if(command){   
+                if(this.messageSent === false) {
+                    this.client.rest.channels.createMessage(msg.channelID, { content:"Please Bare with us! this is a work in progress! for now use / commands." });
+                    this.messageSent = true;
+                }
+            }
+        }        
+    }
+
+    public async loadListeners() {
+        const ListenerFiles = glob.sync(`${process.cwd()}/build/events/**/*{.ts,.js}`);
+        const promises = ListenerFiles.map(async (file) => {
+            let target;
+            if (process.platform === "linux") {
+                target = await import(`${file}`) as Listener | { default: Listener };
+            } else {
+                target = await import(`${process.cwd()}/${file}`) as Listener | { default: Listener };
+            }
+            if ("default" in target) target = target.default; 
+            if (target.once) {
+                this.client.once(target.name, target.listener.bind(this.client));
+            } else {
+                this.client.on(target.name, target.listener.bind(this.client));
+            }
+        });
+        await Promise.all(promises);
     }
 }
