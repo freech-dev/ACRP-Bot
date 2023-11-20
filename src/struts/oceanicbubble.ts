@@ -7,7 +7,7 @@ import { Config } from "./types";
 import { Command } from "./command";
 import { Handler } from "./handler";
 
-import { Vulkava } from 'Vulkava';
+import { Vulkava } from "vulkava";
 
 
 export class OceanBubble extends Client {

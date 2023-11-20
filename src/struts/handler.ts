@@ -85,7 +85,6 @@ export class Handler {
 
     public handleButton(interaction: AnyInteractionGateway) {
         if (interaction.type !== Constants.InteractionTypes.MESSAGE_COMPONENT) return;
-        console.log("Button interaction occurred");
         const command: Command | undefined = this.fetchCommand(interaction.data.customID);
         if (!command) return;
         command.buttonInteraction(interaction as ComponentInteraction);

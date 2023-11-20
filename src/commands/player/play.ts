@@ -1,6 +1,7 @@
 import { OceanBubble } from "../../struts/oceanicbubble";
 import { Command } from "../../struts/command";
-import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes } from "oceanic.js";
+import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ButtonStyles, ComponentTypes, MessageActionRow } from "oceanic.js";
+import { Queue } from "../../struts/queue";
 
 export default class PlayCommand extends Command {
     constructor(client: OceanBubble) {
@@ -33,9 +34,10 @@ export default class PlayCommand extends Command {
             voiceChannelId: interaction.member?.voiceState?.channelID!,
             textChannelId: interaction.channel?.id,
             selfDeaf: true,
+            queue: new Queue()
         });
         player.connect();
-    
+
         if (res.loadType === "LOAD_FAILED") {
             message = {
                 content: `:x: Load failed. Error: ${res.exception?.message}`
@@ -45,41 +47,55 @@ export default class PlayCommand extends Command {
                 content: ':x: No matches!'
             };
         } else if(res.loadType === 'PLAYLIST_LOADED'){
-            // Embeding
-            let author = interaction.user.username;
-            let iconURL = interaction.user.avatarURL("jpeg");
-            let footer = "If more then 25 was added please use /queue"
-            let fields = res.tracks.map((track, index) => {
-
-                // Set Queue
+            await res.tracks.forEach(track => {
                 player.queue.add(track);
-                track.setRequester(interaction.user);
-
-                // Timing
-                let ms = track.duration;
-                let min = Math.floor((ms/1000/60) << 0);
-                let sec = Math.floor((ms/1000) % 60);
-                return { name: ``, value: `${index + 1}: ${track.title}, Duration: ${min}:${sec}` };
+                track.setRequester(interaction.user.id);
             });
-            message = { embeds: [{ fields, author: {name: `${author} added ${res.playlistInfo.name} to queue`, iconURL: iconURL}, footer: { text: footer }}]};
+
+            const queueDetails = (player.queue as Queue).getQueueDetails();
+
+            if(await queueDetails) {
+                const songPages = [];
+                for (let i = 0; i < queueDetails.length; i += 10) {
+                    const songs = queueDetails.slice(i, i + 10);
+                    songPages.push(songs);
+                }
+
+                const embed = {
+                    title: 'Song List',
+                    description: songPages[0].join('\n'),
+                    color: 0x0099ff,
+                };
+
+                let components: MessageActionRow[] = [
+                    {
+                        type: ComponentTypes.ACTION_ROW,
+                        components: [
+                            {
+                                type: ComponentTypes.BUTTON,
+                                style: ButtonStyles.PRIMARY,
+                                label: "Next",
+                                customID: ``,
+                                disabled: false
+                            },
+                            {
+                                type: ComponentTypes.BUTTON,
+                                style: ButtonStyles.SECONDARY,
+                                label: "Previous",
+                                customID: '',
+                                disabled: false
+                            }
+                        ]
+                    }
+                ];
+
+                interaction.createMessage({
+                    embeds: [embed],
+                    components: components
+                })
+            }
         } else {
-            let track = res.tracks[0];
 
-            // Set Queue
-            player.queue.add(track)
-            track.setRequester(interaction.user);
-
-            // Timing
-            let ms = track.duration;
-            let min = Math.floor((ms/1000/60) << 0);
-            let sec = Math.floor((ms/1000) % 60);
-
-            // Embeding
-            let author = interaction.user.username;
-            let iconURL = interaction.user.avatarURL("jpeg");
-
-
-            message = { embeds: [{ author: {name: `${author} added a song to queue`, iconURL: iconURL}, fields: [{ name: `${track.title}`, value: `${min}:${sec}` }] }]};
         }
     
         if (message) {
