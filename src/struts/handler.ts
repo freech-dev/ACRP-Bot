@@ -2,7 +2,7 @@ import { OceanBubble } from "./oceanicbubble";
 import { Command } from "./command";
 import Listener from "./listener";
 import * as glob from 'glob';
-import { AnyInteractionGateway, AnyTextableChannel, Constants, Message, Uncached } from "oceanic.js";
+import { AnyInteractionGateway, AnyTextableChannel, ComponentInteraction, Constants, InteractionTypes, Message, Uncached } from "oceanic.js";
 
 export class Handler {
     protected client: OceanBubble;
@@ -15,6 +15,7 @@ export class Handler {
 
         this.client.on('interactionCreate', this.handleInteraction.bind(this));
         this.client.on('messageCreate', this.handlePrefix.bind(this));
+        this.client.on('interactionCreate', this.handleButton.bind(this));
     }
 
     public async loadCommands() {
@@ -80,6 +81,14 @@ export class Handler {
                 command.messageContext(interaction);
                 break;
         }
+    }
+
+    public handleButton(interaction: AnyInteractionGateway) {
+        if (interaction.type !== Constants.InteractionTypes.MESSAGE_COMPONENT) return;
+        console.log("Button interaction occurred");
+        const command: Command | undefined = this.fetchCommand(interaction.data.customID);
+        if (!command) return;
+        command.buttonInteraction(interaction as ComponentInteraction);
     }
 
     public async handlePrefix(msg: Message<AnyTextableChannel | Uncached>) {
