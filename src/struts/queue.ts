@@ -39,4 +39,11 @@ export class Queue extends AbstractQueue {
         }
         return data;
     }
+
+    getThumbnail() {
+        if (this.tracks.length > 0) {
+            return this.tracks[0].thumbnail;
+        }
+        return null;
+    }
 }

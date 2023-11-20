@@ -85,7 +85,8 @@ export class Handler {
 
     public handleButton(interaction: AnyInteractionGateway) {
         if (interaction.type !== Constants.InteractionTypes.MESSAGE_COMPONENT) return;
-        const command: Command | undefined = this.fetchCommand(interaction.data.customID);
+        const commandName = interaction.data.customID.split('_')[0];
+        const command: Command | undefined = this.fetchCommand(commandName);
         if (!command) return;
         command.buttonInteraction(interaction as ComponentInteraction);
     }
