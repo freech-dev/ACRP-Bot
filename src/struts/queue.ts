@@ -46,4 +46,11 @@ export class Queue extends AbstractQueue {
         }
         return null;
     }
+
+    addTracksAndSetRequester(tracks: Track[], requesterId: string) {
+        tracks.forEach(track => {
+            this.add(track);
+            track.setRequester(requesterId);
+        });
+    }
 }

@@ -21,35 +21,44 @@ export default class PlayCommand extends Command {
                 ]
             }
         });
+        this.interactionRun = this.interactionRun.bind(this)
     }
+
+    readonly components: MessageActionRow[] = [
+        {
+            type: ComponentTypes.ACTION_ROW,
+            components: [
+                {
+                    type: ComponentTypes.BUTTON,
+                    style: ButtonStyles.PRIMARY,
+                    label: "Next",
+                    customID: `play_next`,
+                    disabled: false
+                },
+                {
+                    type: ComponentTypes.BUTTON,
+                    style: ButtonStyles.SECONDARY,
+                    label: "Previous",
+                    customID: 'play_previous',
+                    disabled: false
+                }
+            ]
+        }
+    ];
 
     public async interactionRun(interaction: CommandInteraction) {
         const url = interaction.data.options.getString('url')!;
         const res = await this.client.vulkava.search(url);
         let message;
 
-        //Player
-        const player = this.client.vulkava.createPlayer({
-            guildId: interaction.guild?.id!,
-            voiceChannelId: interaction.member?.voiceState?.channelID!,
-            textChannelId: interaction.channel?.id,
-            selfDeaf: true,
-            queue: new Queue()
-        });
-        player.connect();
+        this.client.createPlayer(interaction);
+        this.client.player.connect()
 
-        if (res.loadType === "LOAD_FAILED" || res.loadType === "NO_MATCHES") {
-            message = {
-                content: res.loadType === "LOAD_FAILED" ? `:x: Load failed. Error: ${res.exception?.message}` : ':x: No matches!'
-            };
-        } else {
+        if (res.loadType !== "LOAD_FAILED" && res.loadType !== "NO_MATCHES") {
             const tracks = res.loadType === 'PLAYLIST_LOADED' ? res.tracks : [res.tracks[0]];
-            tracks.forEach(track => {
-                player.queue.add(track);
-                track.setRequester(interaction.user.id);
-            });
+            tracks.forEach(track => this.client.player.queue.add(track));
 
-            const queueDetails = (player.queue as Queue).getQueueDetails();
+            const queueDetails = (this.client.player.queue as Queue).getQueueDetails();
             if(await queueDetails) {
                 const songPages = [];
                 for (let i = 0; i < queueDetails.length; i += 10) {
@@ -57,8 +66,7 @@ export default class PlayCommand extends Command {
                     songPages.push(songs);
                 }
 
-
-                const thumbnailUrl = (player.queue as Queue).getThumbnail();
+                const thumbnailUrl = (this.client.player.queue as Queue).getThumbnail();
                 const embed: EmbedOptions = {
                     author: {
                         name: 'Queue',
@@ -74,31 +82,9 @@ export default class PlayCommand extends Command {
                     };
                 }
 
-                let components: MessageActionRow[] = [
-                    {
-                        type: ComponentTypes.ACTION_ROW,
-                        components: [
-                            {
-                                type: ComponentTypes.BUTTON,
-                                style: ButtonStyles.PRIMARY,
-                                label: "Next",
-                                customID: `play_next`,
-                                disabled: false
-                            },
-                            {
-                                type: ComponentTypes.BUTTON,
-                                style: ButtonStyles.SECONDARY,
-                                label: "Previous",
-                                customID: 'play_previous',
-                                disabled: false
-                            }
-                        ]
-                    }
-                ];
-
                 interaction.createMessage({
                     embeds: [embed],
-                    components: components
+                    components: this.components
                 });
             }
         }
@@ -107,18 +93,14 @@ export default class PlayCommand extends Command {
             interaction.createMessage(message);
         }
 
-        if (!player.playing) player.play();
+        if (!this.client.player.playing) this.client.player.play();
     }
 
     public async buttonInteraction(interaction: ComponentInteraction) {
         if (interaction.data.customID.startsWith('play_next')) {
-            interaction.createMessage({
-                content: `this is a work in progress come back later. **if you belive this is an error please contact *mythicxgn***`
-            });
+            
         } else if (interaction.data.customID.startsWith('play_previous')) {
-            interaction.createMessage({
-                content: `this is a work in progress come back later. **if you belive this is an error please contact *mythicxgn***`
-            });
+            
         }
     }
 }

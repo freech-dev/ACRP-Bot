@@ -1,4 +1,4 @@
-import { Client, ClientOptions, Collection } from "oceanic.js";
+import { Client, ClientOptions, Collection, CommandInteraction } from "oceanic.js";
 
 import * as winston from 'winston';
 import { Logger, createLogger } from "winston";
@@ -7,8 +7,8 @@ import { Config } from "./types";
 import { Command } from "./command";
 import { Handler } from "./handler";
 
-import { Vulkava } from "vulkava";
-
+import { Vulkava, Player } from "vulkava";
+import { Queue } from "./queue";
 
 export class OceanBubble extends Client {
     public logger: Logger;
@@ -17,11 +17,14 @@ export class OceanBubble extends Client {
     public alias: Collection<string, string>;
     public config: Config;
     public vulkava: Vulkava;
+    public player: Player;
+    
     firstReady = false;
+    interactionRun: any;
 
     public constructor (options?: ClientOptions){
         super(options);
-
+        
         this.commands = new Collection<string, Command>();
         this.alias = new Collection<string, string>();
         this.handler = new Handler(this);
@@ -62,6 +65,16 @@ export class OceanBubble extends Client {
         
         this.vulkava.on('error', (node, err) => {
             this.logger.error(`[Vulkava] Error on node ${node.identifier}`, err.message)
+        });
+    }
+
+    createPlayer(interaction: CommandInteraction) {
+        this.player = this.vulkava.createPlayer({
+            guildId: interaction.guild?.id!,
+            voiceChannelId: interaction.member?.voiceState?.channelID ?? '',
+            textChannelId: interaction.channel?.id,
+            selfDeaf: true,
+            queue: new Queue()
         });
     }
 }
