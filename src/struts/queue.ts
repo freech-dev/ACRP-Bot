@@ -2,7 +2,8 @@ import { AbstractQueue, Track } from "vulkava";
 
 export class Queue extends AbstractQueue {
     tracks: Track[];
-
+    currentSongIndex: number;
+    
     constructor() {
         super();
         this.tracks = [];
@@ -19,7 +20,7 @@ export class Queue extends AbstractQueue {
     add(track: Track) {
         this.tracks.push(track);
     }
-
+    
     poll() {
         return this.tracks.shift() || null;
     }
@@ -52,5 +53,9 @@ export class Queue extends AbstractQueue {
             this.add(track);
             track.setRequester(requesterId);
         });
+    }
+
+    getCurrentSongIndex(): number {
+        return this.currentSongIndex;
     }
 }
