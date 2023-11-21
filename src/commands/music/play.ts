@@ -116,6 +116,7 @@ export default class PlayCommand extends Command {
             if(nextPage){
                 const nextEmbed = this.createEmbed(interaction, nextPage);
                 interaction.createMessage({
+                    content: "",
                     embeds: [nextEmbed],
                     components: this.components
                 });
@@ -127,6 +128,7 @@ export default class PlayCommand extends Command {
             if(previousPage){
                 const previousEmbed = this.createEmbed(interaction, previousPage);
                 interaction.createMessage({
+                    content: "",
                     embeds: [previousEmbed],
                     components: this.components
                 });
