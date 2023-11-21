@@ -10,8 +10,8 @@ export class Handler {
     constructor(client: OceanBubble) {
         this.client = client;
 
-        this.loadCommands().then(() => this.client.logger.info(`Loaded ${this.client.commands.size} commands.`)).catch((err) => console.log(err));
-        this.loadListeners().then(() => this.client.logger.info(`Loaded Listeners.`));
+        this.loadCommands()
+        this.loadListeners()
 
         this.client.on('interactionCreate', this.handleInteraction.bind(this));
         this.client.on('messageCreate', this.handlePrefix.bind(this));

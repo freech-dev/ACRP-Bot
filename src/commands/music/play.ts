@@ -9,13 +9,13 @@ export default class PlayCommand extends Command {
     constructor(client: OceanBubble) {
         super(client, {
             name: "play",
-            description: "plays a song",
+            description: "play a song or search a song",
             slash: {
                 enabled: true,
                 type: ApplicationCommandTypes.CHAT_INPUT,
                 options: [
                     {
-                        name: "url",
+                        name: "search",
                         description: "song url or playlist url",
                         type: ApplicationCommandOptionTypes.STRING,
                         required: true
@@ -78,7 +78,7 @@ export default class PlayCommand extends Command {
     }
 
     public async interactionRun(interaction: CommandInteraction) {
-        const url = interaction.data.options.getString('url')!;
+        const url = interaction.data.options.getString('search')!;
         const res = await this.client.vulkava.search(url);
         let message;
     

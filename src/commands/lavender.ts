@@ -1,6 +1,6 @@
 import { OceanBubble } from "../struts/oceanicbubble";
 import { Command } from "../struts/command";
-import { CommandInteraction, ApplicationCommandTypes, ComponentTypes, ButtonStyles, MessageComponentInteractionData, ComponentInteraction, Constants } from "oceanic.js";
+import { CommandInteraction, ApplicationCommandTypes } from "oceanic.js";
 
 export default class ServerCommand extends Command {
     constructor(client: OceanBubble) {
