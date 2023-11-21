@@ -127,7 +127,7 @@ export default class PlayCommand extends Command {
             
             if(previousPage){
                 const previousEmbed = this.createEmbed(interaction, previousPage);
-                interaction.createMessage({
+                interaction.editOriginal({
                     content: "",
                     embeds: [previousEmbed],
                     components: this.components

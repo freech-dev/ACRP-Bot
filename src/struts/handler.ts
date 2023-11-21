@@ -18,9 +18,8 @@ export class Handler {
         this.client.on('interactionCreate', this.handleButton.bind(this));
     }
 
-    public async loadCommands() {
-        const commandFiles = glob.sync(`${process.cwd()}/build/commands/**/*{.ts,.js}`);
-        const promises = commandFiles.map(async (file) => {
+    public async loadModules(moduleFiles: string[], isCommand: boolean) {
+        const promises = moduleFiles.map(async (file) => {
             let target;
             if (process.platform === "linux") {
                 target = await import(`${file}`);
@@ -28,20 +27,29 @@ export class Handler {
                 target = await import(`${process.cwd()}/${file}`);
             }
             if ("default" in target) target = target.default; 
-            const targetFile: Command = new target(this.client);
-            if (this.client.commands.has(targetFile.options.name)) return;
-            if (targetFile.options.name.length < 3 && targetFile.options.slash?.enabled) {
-                throw new TypeError('Commands which have slash enabled must be atleast 3 characters long.');
-            }
-            this.client.commands.set(targetFile.options.name, targetFile);
-            const commandAliases = targetFile.options.aliases as Array<any>;
-            if (targetFile.options.aliases) {
-                commandAliases.forEach(alias => {
-                    this.client.alias.set(alias, targetFile.options.name);
-                });
+    
+            if (isCommand) {
+                const targetFile: Command = new target(this.client);
+                if (this.client.commands.has(targetFile.options.name)) return;
+                if (targetFile.options.name.length < 3 && targetFile.options.slash?.enabled) {
+                    throw new TypeError('Commands which have slash enabled must be atleast 3 characters long.');
+                }
+                this.client.commands.set(targetFile.options.name, targetFile);
+                const commandAliases = targetFile.options.aliases as Array<any>;
+                if (targetFile.options.aliases) {
+                    commandAliases.forEach(alias => {
+                        this.client.alias.set(alias, targetFile.options.name);
+                    });
+                }
+            } else {
+                if (target.once) {
+                    this.client.once(target.name, target.listener.bind(this.client));
+                } else {
+                    this.client.on(target.name, target.listener.bind(this.client));
+                }
             }
         });
-
+    
         await Promise.all(promises)
     }
 
@@ -110,22 +118,13 @@ export class Handler {
         }        
     }
 
+    public async loadCommands() {
+        const commandFiles = glob.sync(`${process.cwd()}/build/commands/**/*{.ts,.js}`);
+        this.loadModules(commandFiles, true).then(() => this.client.logger.info(`Loaded ${this.client.commands.size} commands.`)).catch((err) => console.log(err));
+    }
+
     public async loadListeners() {
         const ListenerFiles = glob.sync(`${process.cwd()}/build/events/**/*{.ts,.js}`);
-        const promises = ListenerFiles.map(async (file) => {
-            let target;
-            if (process.platform === "linux") {
-                target = await import(`${file}`) as Listener | { default: Listener };
-            } else {
-                target = await import(`${process.cwd()}/${file}`) as Listener | { default: Listener };
-            }
-            if ("default" in target) target = target.default; 
-            if (target.once) {
-                this.client.once(target.name, target.listener.bind(this.client));
-            } else {
-                this.client.on(target.name, target.listener.bind(this.client));
-            }
-        });
-        await Promise.all(promises);
+        this.loadModules(ListenerFiles, false).then(() => this.client.logger.info(`Loaded Listeners.`));
     }
 }
