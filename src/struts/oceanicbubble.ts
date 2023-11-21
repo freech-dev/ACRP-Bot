@@ -3,6 +3,7 @@ import { Client, ClientOptions, Collection, CommandInteraction } from "oceanic.j
 import * as winston from 'winston';
 import { Logger, createLogger } from "winston";
 
+import config from '../config'
 import { Config } from "./types";
 import { Command } from "./command";
 import { Handler } from "./handler";
@@ -24,7 +25,7 @@ export class OceanBubble extends Client {
 
     public constructor (options?: ClientOptions){
         super(options);
-        
+        this.config = config;
         this.commands = new Collection<string, Command>();
         this.alias = new Collection<string, string>();
         this.handler = new Handler(this);

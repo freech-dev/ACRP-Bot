@@ -29,32 +29,32 @@ export default new Listener("messageCreate", false, async function(this: OceanBu
 
             if(MemberDB === null || undefined) return;
             
-            // if(MemberDB){
-            //     if(MemberDB.lvl === 0) {
-            //         MemberDB.lvl = 1;
-            //         manager.save(MemberDB);
-            //     } else {
-            //         var exp = Math.floor(Math.random() * 15) + 1;
-            //         var lvlup = Math.floor(MemberDB.lvl * 50);
+            if(MemberDB){
+                if(MemberDB.lvl === 0) {
+                    MemberDB.lvl = 1;
+                    manager.save(MemberDB);
+                } else {
+                    var exp = Math.floor(Math.random() * 15) + 1;
+                    var lvlup = Math.floor(MemberDB.lvl * 50);
                     
-            //         // Lvl: 1 exp: 100 
-            //         // Lvl: 2 exp: 200
-            //         // Lvl: 3 exp: 300
+                    // Lvl: 1 exp: 100 
+                    // Lvl: 2 exp: 200
+                    // Lvl: 3 exp: 300
 
-            //         MemberDB.xp = exp + MemberDB.xp;
-            //         manager.save(MemberDB);
+                    MemberDB.xp = exp + MemberDB.xp;
+                    await manager.save(MemberDB);
 
-            //         if(MemberDB.xp > lvlup){
-            //             MemberDB.lvl = MemberDB.lvl + 1;
-            //             MemberDB.xp = 0;
-            //             manager.save(MemberDB);
+                    if(MemberDB.xp > lvlup){
+                        MemberDB.lvl = MemberDB.lvl + 1;
+                        MemberDB.xp = 0;
+                        await manager.save(MemberDB);
 
-            //             this.rest.channels.createMessage(msg.channelID, {
-            //                 content: `${msg.author.mention}, You Have leveled up to level ${MemberDB.lvl} and need ${lvlup + 50} xp`
-            //             });
-            //         }
-            //     }
-            // }
+                        this.rest.channels.createMessage(msg.channelID, {
+                            content: `${msg.author.mention}, You Have leveled up to level ${MemberDB.lvl} and need ${lvlup + 50} xp`
+                        });
+                    }
+                }
+            }
         }
     }
 });
