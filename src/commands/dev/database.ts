@@ -1,5 +1,5 @@
-import { OceanBubble } from "../../struts/oceanicbubble";
-import { Command } from "../../struts/command";
+import { OceanBubble } from "../../structs/oceanicbubble";
+import { Command } from "../../structs/command";
 import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes } from "oceanic.js";
 
 import { Equal } from 'typeorm';

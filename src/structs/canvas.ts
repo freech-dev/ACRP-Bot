@@ -24,6 +24,6 @@ export default class MemberCanvas {
     }
 
     getCanvas() {
-        return this.canvas.toDataURL();
+        return this.canvas.data();
     }
 }

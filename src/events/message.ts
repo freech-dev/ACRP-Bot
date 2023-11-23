@@ -1,5 +1,5 @@
-import { OceanBubble } from "struts/oceanicbubble";
-import Listener  from "../struts/listener";
+import { OceanBubble } from "structs/oceanicbubble";
+import Listener  from "../structs/listener";
 import { Message, Uncached } from "oceanic.js";
 
 import Database from "../database/database";

@@ -1,7 +1,7 @@
-import { OceanBubble } from "../../struts/oceanicbubble";
-import { Command } from "../../struts/command";
+import { OceanBubble } from "../../structs/oceanicbubble";
+import { Command } from "../../structs/command";
 import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ButtonStyles, ComponentTypes, MessageActionRow, ComponentInteraction, EmbedOptions } from "oceanic.js";
-import { Queue } from "../../struts/queue";
+import { Queue } from "../../structs/queue";
 
 export default class PlayCommand extends Command {
     private songPages: string[][] = [];

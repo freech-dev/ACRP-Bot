@@ -1,7 +1,7 @@
 import { CommandInteraction, ApplicationCommandTypes } from "oceanic.js";
-import MemberCanvas from "../struts/canvas";
-import { OceanBubble } from "../struts/oceanicbubble";
-import { Command } from "../struts/command";
+import MemberCanvas from "../structs/canvas";
+import { OceanBubble } from "../structs/oceanicbubble";
+import { Command } from "../structs/command";
 
 export default class UserCardCommand extends Command {
     constructor(client: OceanBubble) {
@@ -18,13 +18,15 @@ export default class UserCardCommand extends Command {
     public async interactionRun(interaction: CommandInteraction) {
         let canvas = new MemberCanvas();
         await canvas.drawImage('https://img.freepik.com/free-vector/stylish-glowing-digital-red-lines-banner_1017-23964.jpg');
-        const buffer = canvas.getCanvas().toBuffer();
-        const base64Image = `data:image/png;base64,${buffer.toString('base64')}`;
+        const dataUrl = canvas.getCanvas();
+        const base64Image = dataUrl.split(",")[1];
+        const buffer = Buffer.from(base64Image, 'base64');
+
         await interaction.createMessage({
             embeds: [
                 {
                     image: {
-                        url: base64Image
+                        url: `${buffer}`
                     }
                 }
             ]

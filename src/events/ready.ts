@@ -1,4 +1,4 @@
-import Listener  from "../struts/listener";
+import Listener  from "../structs/listener";
 
 export default new Listener("ready", false, async function() {
     this.logger.info(`Launched as ${this.user.username}`);

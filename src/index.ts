@@ -1,4 +1,4 @@
-import { OceanBubble as client } from "./struts/oceanicbubble";
+import { OceanBubble as client } from "./structs/oceanicbubble";
 import * as dotenv from 'dotenv';
 dotenv.config();
 
