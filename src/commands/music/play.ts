@@ -19,6 +19,12 @@ export default class PlayCommand extends Command {
                         description: "song url or playlist url",
                         type: ApplicationCommandOptionTypes.STRING,
                         required: true
+                    },
+                    {
+                        name: "volume",
+                        description: "1-100%",
+                        type: ApplicationCommandOptionTypes.NUMBER,
+                        required: true
                     }
                 ]
             }
@@ -78,11 +84,13 @@ export default class PlayCommand extends Command {
     }
 
     public async interactionRun(interaction: CommandInteraction) {
+        const volume = interaction.data.options.getNumber('volume')!;
         const url = interaction.data.options.getString('search')!;
         const res = await this.client.vulkava.search(url);
         let message;
     
         this.client.createPlayer(interaction);
+        this.client.player.filters.setVolume(volume);
         this.client.player.connect()
     
         if (res.loadType !== "LOAD_FAILED" && res.loadType !== "NO_MATCHES") {
@@ -116,7 +124,6 @@ export default class PlayCommand extends Command {
             if(nextPage){
                 const nextEmbed = this.createEmbed(interaction, nextPage);
                 interaction.createMessage({
-                    content: "",
                     embeds: [nextEmbed],
                     components: this.components
                 });
@@ -128,7 +135,6 @@ export default class PlayCommand extends Command {
             if(previousPage){
                 const previousEmbed = this.createEmbed(interaction, previousPage);
                 interaction.editOriginal({
-                    content: "",
                     embeds: [previousEmbed],
                     components: this.components
                 });

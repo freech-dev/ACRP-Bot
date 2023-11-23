@@ -25,8 +25,20 @@ export default class ServerCommand extends Command {
                         required: true
                     },
                     {
-                        name: "dataset",
-                        description: "deleats the selected id of a dataset",
+                        name: "mention",
+                        description: "mention of a user",
+                        type: ApplicationCommandOptionTypes.MENTIONABLE,
+                        required: false
+                    },
+                    {
+                        name: "var",
+                        description: "xp or lvl",
+                        type: ApplicationCommandOptionTypes.STRING,
+                        required: false
+                    },
+                    {
+                        name: "number",
+                        description: "number",
                         type: ApplicationCommandOptionTypes.NUMBER,
                         required: false
                     }
@@ -37,7 +49,10 @@ export default class ServerCommand extends Command {
 
     public async interactionRun(interaction: CommandInteraction) {
         const arg = interaction.data.options.getString('database');
-        const dataset = interaction.data.options.getNumber('dataset');
+        const mention = interaction.data.options.getMentionable('mention');
+        const varr = interaction.data.options.getString('var');
+        const number = interaction.data.options.getNumber('number');
+
         const manager = await Database.getInstance().getManager()
 
         if(!manager) return;
@@ -53,7 +68,7 @@ export default class ServerCommand extends Command {
                     content: `Database: Member: Returned Null`
                 });
             } else {
-                if(!dataset){
+                if(!mention){
                     let members = await manager.find(Member);
 
                     let memberList = "";
@@ -66,22 +81,28 @@ export default class ServerCommand extends Command {
                         content: `Members:\n${memberList}`
                     });
                 } else {
+                    if(mention.id === undefined) return;
                     let member = await manager.findOne(Member, {
                         where: {
-                            id: Equal(dataset)
+                            MemberID: mention.id
                         }
                     });
 
-                    if(!member){
-                        interaction.createMessage({
-                            content: `That Dataset could not be found in Database: Member: ID: returned null`
-                        });
-                    } else {
-                        await manager.remove(member);
+                    if(!member) return;
+                    if(!varr) return;
+                    if(!number) return;
+
+                    if(varr === 'xp'){
+                        member.xp = member.xp + number;
+                        await manager.save(member);
 
                         interaction.createMessage({
-                            content: `Dataset Removed!`
-                        });
+                            content: `${mention.mention}, was set to xp: ${member.xp}`
+                        })
+                    }
+
+                    if(varr === 'lvl'){
+
                     }
                 }
             }

@@ -1,4 +1,4 @@
-import { CommandInteraction, ComponentInteraction } from 'oceanic.js';
+import { CommandInteraction, ComponentInteraction, MessageAttachment } from 'oceanic.js';
 import { CommandOptions } from "./types";
 import { OceanBubble } from "./oceanicbubble";
 
@@ -11,7 +11,6 @@ export abstract class Command {
         this.client = client;
         this.options = options;
     }
-
 
     public buttonInteraction (interaction: ComponentInteraction): void | Promise<void> {}
     public interactionRun (interaction: CommandInteraction): void | Promise<void> {}

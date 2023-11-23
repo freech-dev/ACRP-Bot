@@ -49,7 +49,7 @@ export default new Listener("messageCreate", false, async function(this: OceanBu
                         MemberDB.xp = 0;
                         await manager.save(MemberDB);
 
-                        this.rest.channels.createMessage(msg.channelID, {
+                        await this.rest.channels.createMessage(msg.channelID, {
                             content: `${msg.author.mention}, You Have leveled up to level ${MemberDB.lvl} and need ${lvlup + 50} xp`
                         });
                     }

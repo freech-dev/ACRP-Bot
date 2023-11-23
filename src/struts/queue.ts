@@ -58,4 +58,5 @@ export class Queue extends AbstractQueue {
     getCurrentSongIndex(): number {
         return this.currentSongIndex;
     }
+
 }

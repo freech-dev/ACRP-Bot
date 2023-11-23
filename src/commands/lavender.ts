@@ -2,7 +2,7 @@ import { OceanBubble } from "../struts/oceanicbubble";
 import { Command } from "../struts/command";
 import { CommandInteraction, ApplicationCommandTypes } from "oceanic.js";
 
-export default class ServerCommand extends Command {
+export default class LavanderCommand extends Command {
     constructor(client: OceanBubble) {
         super(client, {
             name: "lavender",
