@@ -1,7 +1,7 @@
-import { CommandInteraction, ApplicationCommandTypes } from "oceanic.js";
-import MemberCanvas from "../structs/canvas";
-import { OceanBubble } from "../structs/oceanicbubble";
+import axios from "axios";
+import { ApplicationCommandTypes, CommandInteraction } from "oceanic.js";
 import { Command } from "../structs/command";
+import { OceanBubble } from "../structs/oceanicbubble";
 
 export default class UserCardCommand extends Command {
     constructor(client: OceanBubble) {
@@ -16,18 +16,28 @@ export default class UserCardCommand extends Command {
     }
 
     public async interactionRun(interaction: CommandInteraction) {
-        let canvas = new MemberCanvas();
-        await canvas.drawImage('https://img.freepik.com/free-vector/stylish-glowing-digital-red-lines-banner_1017-23964.jpg');
-        const dataUrl = canvas.getCanvas();
-        const base64Image = dataUrl.split(",")[1];
-        const buffer = Buffer.from(base64Image, 'base64');
+        interaction.defer(1 << 7)
+        const response = await axios.post(`${process.env.APISERVER}/v1/imageProcessing/usercard`, {
+            url: "https://img.freepik.com/free-vector/stylish-glowing-digital-red-lines-banner_1017-23964.jpg"
+        }, {
+            responseType: "arraybuffer",
+        });
 
-        await interaction.createMessage({
+        let embedImageIdentification = `usercard__${interaction.user.id}.png`
+        const embedImageAfterGeneration = response.data
+        console.log(embedImageAfterGeneration)
+        await interaction.createFollowup({
             embeds: [
                 {
                     image: {
-                        url: `${buffer}`
+                        url: `attachment://${embedImageIdentification}`  
                     }
+                }
+            ],
+            files: [
+                {
+                    name: embedImageIdentification,
+                    contents: embedImageAfterGeneration
                 }
             ]
         });

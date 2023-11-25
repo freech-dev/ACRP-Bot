@@ -24,8 +24,8 @@
   },
   "devDependencies": {
     "@discordjs/voice": "^0.16.1",
-    "@napi-rs/canvas": "^0.1.44",
     "@smol-code/tsconfig": "^1.0.0",
+    "reflect-metadata": "^0.1.13",
     "@types/node": "^16.18.21",
     "@types/request": "^2.48.8",
     "ts-node": "10.9.1",
