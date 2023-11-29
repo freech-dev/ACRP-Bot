@@ -1,7 +1,9 @@
 import { OceanBubble } from "../../structs/oceanicbubble";
 import { Command } from "../../structs/command";
-import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ButtonStyles, ComponentTypes, MessageActionRow, ComponentInteraction, EmbedOptions } from "oceanic.js";
+import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ButtonStyles, ComponentTypes, MessageActionRow, ComponentInteraction, EmbedOptions, Message } from "oceanic.js";
 import { Queue } from "../../structs/queue";
+
+import ms from 'ms';
 
 export default class PlayCommand extends Command {
     private songPages: string[][] = [];
@@ -39,17 +41,31 @@ export default class PlayCommand extends Command {
                 {
                     type: ComponentTypes.BUTTON,
                     style: ButtonStyles.PRIMARY,
-                    label: "Next",
+                    label: "⬅",
+                    customID: 'play_previous',
+                    disabled: false
+                },
+                {
+                    type: ComponentTypes.BUTTON,
+                    style: ButtonStyles.PRIMARY,
+                    label: "➡",
                     customID: `play_next`,
                     disabled: false
                 },
                 {
                     type: ComponentTypes.BUTTON,
-                    style: ButtonStyles.SECONDARY,
-                    label: "Previous",
-                    customID: 'play_previous',
+                    style: ButtonStyles.DANGER,
+                    label: `🛑`,
+                    customID: `play_stop`,
                     disabled: false
-                }
+                },
+                // {
+                //     type: ComponentTypes.BUTTON,
+                //     style: ButtonStyles.PRIMARY,
+                //     label: `🔊`,
+                //     customID: `play_volume`,
+                //     disabled: false
+                // }
             ]
         }
     ];
@@ -88,6 +104,8 @@ export default class PlayCommand extends Command {
         const url = interaction.data.options.getString('search')!;
         const res = await this.client.vulkava.search(url);
         let message;
+
+
     
         this.client.createPlayer(interaction);
         this.client.player.filters.setVolume(volume);
@@ -140,5 +158,20 @@ export default class PlayCommand extends Command {
                 });
             }
         }
+        if(interaction.data.customID.startsWith('play_stop')){
+            this.client.player.destroy();
+            interaction.createMessage({
+                content: `Player has stopped.`
+            });
+        }
+        // if(interaction.data.customID.startsWith('play_volume')){
+        //     this.client.rest.channels.getMessages(interaction.channelID)
+        //     .then(messages => {
+        //         const userMessages = messages.filter(m => m.author.id === interaction.user.id);
+                
+        //         const latestMessage = userMessages.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime())[0];
+        //         console.log(latestMessage);
+        //     });
+        // }
     }
 }
