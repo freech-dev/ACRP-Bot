@@ -3,8 +3,6 @@ import { Command } from "../../structs/command";
 import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ButtonStyles, ComponentTypes, MessageActionRow, ComponentInteraction, EmbedOptions, Message } from "oceanic.js";
 import { Queue } from "../../structs/queue";
 
-import ms from 'ms';
-
 export default class PlayCommand extends Command {
     private songPages: string[][] = [];
     private pageNumber = 0;
