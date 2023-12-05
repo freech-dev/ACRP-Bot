@@ -40,10 +40,12 @@ export default class GlobalBanCommand extends Command {
             if(await this.client.users.get(member.id)){
                 const user = this.client.rest.users.get(member?.id);
 
-                this.client.guilds.forEach(g => {
-                    g.editMember(member.id, {
-                        nick: nick
-                    });
+                this.client.guilds.forEach(async g => {
+                    if(g.members.find(m => m.id === member.id)){
+                        g.editMember(member.id, {
+                            nick: nick
+                        });
+                    }
                 });
 
                 interaction.createMessage({
