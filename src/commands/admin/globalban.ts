@@ -3,7 +3,7 @@ import { Command } from "../../structs/command";
 import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ComponentInteraction } from "oceanic.js";
 
 import Database from "../../database/database";
-import { Guild } from "../../database/entity/bans";
+import { Bans } from "../../database/entity/bans";
 
 export default class GlobalBanCommand extends Command {
     constructor(client: OceanBubble) {
