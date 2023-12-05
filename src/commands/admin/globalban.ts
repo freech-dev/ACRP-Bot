@@ -1,6 +1,9 @@
 import { OceanBubble } from "../../structs/oceanicbubble";
 import { Command } from "../../structs/command";
-import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ComponentInteraction, EmbedOptions } from "oceanic.js";
+import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ComponentInteraction } from "oceanic.js";
+
+import Database from "../../database/database";
+import { Guild } from "../../database/entity/bans";
 
 export default class GlobalBanCommand extends Command {
     constructor(client: OceanBubble) {
@@ -40,7 +43,8 @@ export default class GlobalBanCommand extends Command {
 
             if(!reason) return;
 
-            this.client.rest.channels.createMessage(member.id, {
+            const dmChannel = await this.client.rest.users.createDM(member.id)
+            const msg = this.client.rest.channels.createMessage(dmChannel.id, {
                 embeds: [
                     {
                         author: {
@@ -59,29 +63,31 @@ export default class GlobalBanCommand extends Command {
                 ]
             });
 
-            if(await this.client.rest.users.get(member.id)){
-                this.client.guilds.forEach(g => {
-                    g.createBan(member.id);
-                });
-
-                interaction.createMessage({
-                    embeds: [
-                        {
-                            author: {
-                                name: `ACRP | Global Ban`
-                            },
-                            
-                            fields: [
-                                {
-                                    name: `${(await user).username} was globally banned for`,
-                                    value: `${reason}`
-                                }
-                            ],
+            if(await msg){
+                if(await this.client.rest.users.get(member.id)){
+                    this.client.guilds.forEach(g => {
+                        g.createBan(member.id);
+                    });
     
-                            color: 0xa23bff
-                        }
-                    ]
-                });
+                    interaction.createMessage({
+                        embeds: [
+                            {
+                                author: {
+                                    name: `ACRP | Global Ban`
+                                },
+                                
+                                fields: [
+                                    {
+                                        name: `${(await user).username} was globally banned for`,
+                                        value: `${reason}`
+                                    }
+                                ],
+        
+                                color: 0xa23bff
+                            }
+                        ]
+                    });
+                }
             }
         } else {
             interaction.createMessage({

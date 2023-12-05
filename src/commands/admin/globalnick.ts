@@ -2,7 +2,7 @@ import { OceanBubble } from "../../structs/oceanicbubble";
 import { Command } from "../../structs/command";
 import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ComponentInteraction, EmbedOptions } from "oceanic.js";
 
-export default class GlobalBanCommand extends Command {
+export default class GlobalNickCommand extends Command {
     constructor(client: OceanBubble) {
         super(client, {
             name: "globalnick",

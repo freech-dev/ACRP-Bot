@@ -1,11 +1,17 @@
 import { Entity, Column, PrimaryGeneratedColumn } from "typeorm"
 
 @Entity()
-export class Member {
+export class Bans {
 
     @PrimaryGeneratedColumn()
     id: Number
 
     @Column()
-    ServerID: Number
+    BanID: Number
+
+    @Column()
+    BanDate: string
+
+    @Column()
+    BanLength: string
 }
