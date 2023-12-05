@@ -5,8 +5,8 @@ import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTy
 export default class GlobalBanCommand extends Command {
     constructor(client: OceanBubble) {
         super(client, {
-            name: "globalban",
-            description: "global bans the user given",
+            name: "globalnick",
+            description: "global nicks the user in all servers",
             slash: {
                 enabled: true,
                 type: ApplicationCommandTypes.CHAT_INPUT,
@@ -18,8 +18,8 @@ export default class GlobalBanCommand extends Command {
                         required: true
                     },
                     {
-                        name: "reason",
-                        description: "reason for the ban",
+                        name: "nickname",
+                        description: "nickname to set",
                         type: ApplicationCommandOptionTypes.STRING,
                         required: true
                     }
@@ -30,54 +30,36 @@ export default class GlobalBanCommand extends Command {
     }
 
     public async interactionRun(interaction: CommandInteraction) {
-        if(interaction.member?.permissions.has("BAN_MEMBERS")){
+        if(interaction.member?.permissions.has("CHANGE_NICKNAME")){
             const member = interaction.data.options.getMentionable("user");
-            const reason = interaction.data.options.getString("reason");
-
+            const nick = interaction.data.options.getString("nickname");
+    
+            if(!nick) return;
             if(!member) return;
 
-            const user = this.client.rest.users.get(member?.id);
+            if(await this.client.users.get(member.id)){
+                const user = this.client.rest.users.get(member?.id);
 
-            if(!reason) return;
-
-            this.client.rest.channels.createMessage(member.id, {
-                embeds: [
-                    {
-                        author: {
-                            name: `ACRP | Global Ban`
-                        },
-                        
-                        fields: [
-                            {
-                                name: `${(await user).username} was globally banned for`,
-                                value: `${reason}`
-                            }
-                        ],
-
-                        color: 0xa23bff
-                    }
-                ]
-            });
-
-            if(await this.client.rest.users.get(member.id)){
                 this.client.guilds.forEach(g => {
-                    g.createBan(member.id);
+                    g.editMember(member.id, {
+                        nick: nick
+                    });
                 });
 
                 interaction.createMessage({
                     embeds: [
                         {
                             author: {
-                                name: `ACRP | Global Ban`
+                                name: `ACRP | GlobalNick`
                             },
-                            
+
                             fields: [
                                 {
-                                    name: `${(await user).username} was globally banned for`,
-                                    value: `${reason}`
+                                    name: `${(await user).username} had they're username globally changed to`,
+                                    value: `${nick}`
                                 }
                             ],
-    
+
                             color: 0xa23bff
                         }
                     ]
