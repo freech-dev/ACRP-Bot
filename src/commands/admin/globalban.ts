@@ -3,6 +3,7 @@ import { Command } from "../../structs/command";
 import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ComponentInteraction } from "oceanic.js";
 
 import Database from "../../database/database";
+import { db } from "../../index"
 import { Bans } from "../../database/entity/bans";
 
 export default class GlobalBanCommand extends Command {
@@ -91,6 +92,7 @@ export default class GlobalBanCommand extends Command {
                             BanReason: reason,
                             BanLength: length
                         });
+                        db.query('INSERT INTO bans (user_id, reason) VALUES (?, ?)', [member.id, reason])
                     }
     
                     interaction.createMessage({
