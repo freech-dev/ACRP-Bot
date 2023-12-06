@@ -1,15 +1,12 @@
 import { OceanBubble } from "../../structs/oceanicbubble";
 import { Command } from "../../structs/command";
-import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ComponentInteraction } from "oceanic.js";
+import { CommandInteraction, ApplicationCommandTypes, ApplicationCommandOptionTypes, ComponentInteraction, EmbedOptions } from "oceanic.js";
 
-import Database from "../../database/database";
-import { Bans } from "../../database/entity/bans";
-
-export default class GlobalBanCommand extends Command {
+export default class GlobalKickCommand extends Command {
     constructor(client: OceanBubble) {
         super(client, {
-            name: "globalban",
-            description: "global bans the user given",
+            name: "globalkick",
+            description: "kicks the user globally",
             slash: {
                 enabled: true,
                 type: ApplicationCommandTypes.CHAT_INPUT,
@@ -22,7 +19,7 @@ export default class GlobalBanCommand extends Command {
                     },
                     {
                         name: "reason",
-                        description: "reason for the ban",
+                        description: "reason to kick",
                         type: ApplicationCommandOptionTypes.STRING,
                         required: true
                     }
@@ -33,11 +30,10 @@ export default class GlobalBanCommand extends Command {
     }
 
     public async interactionRun(interaction: CommandInteraction) {
-        if(interaction.member?.permissions.has("BAN_MEMBERS")){
-            const manager = await Database.getInstance().getManager()
+        if(interaction.member?.permissions.has("KICK_MEMBERS")){
             const member = interaction.data.options.getMentionable("user");
             const reason = interaction.data.options.getString("reason");
-
+            
             if(!member) return;
 
             const user = this.client.rest.users.get(member?.id);
@@ -66,31 +62,10 @@ export default class GlobalBanCommand extends Command {
 
             if(await msg){
                 if(await this.client.rest.users.get(member.id)){
-                    this.client.guilds.forEach(g => {
-                        g.createBan(member.id, {
-                            reason: reason
-                        });
-                    });
-
-                    
-    
-                    interaction.createMessage({
-                        embeds: [
-                            {
-                                author: {
-                                    name: `ACRP | Global Ban`
-                                },
-                                
-                                fields: [
-                                    {
-                                        name: `${(await user).username} was globally banned for`,
-                                        value: `${reason}`
-                                    }
-                                ],
-        
-                                color: 0xa23bff
-                            }
-                        ]
+                    this.client.guilds.forEach(async g => {
+                        if(g.members.find(m => m.id === member.id)){
+                            this.client.rest.guilds.removeMember(g.id, member.id, reason)
+                        }
                     });
                 }
             }
