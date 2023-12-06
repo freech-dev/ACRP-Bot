@@ -7,10 +7,10 @@ export class Bans {
     id: Number
 
     @Column()
-    BanID: Number
+    BanID: string
 
     @Column()
-    BanDate: string
+    BanDate: number
 
     @Column()
     BanLength: string

@@ -25,6 +25,12 @@ export default class GlobalBanCommand extends Command {
                         description: "reason for the ban",
                         type: ApplicationCommandOptionTypes.STRING,
                         required: true
+                    },
+                    {
+                        name: "length",
+                        description: "length of the ban",
+                        type: ApplicationCommandOptionTypes.STRING,
+                        required: true
                     }
                 ]
             }
@@ -37,12 +43,14 @@ export default class GlobalBanCommand extends Command {
             const manager = await Database.getInstance().getManager()
             const member = interaction.data.options.getMentionable("user");
             const reason = interaction.data.options.getString("reason");
+            const length = interaction.data.options.getString("length");
 
             if(!member) return;
 
             const user = this.client.rest.users.get(member?.id);
 
             if(!reason) return;
+            if(!length)return;
 
             const dmChannel = await this.client.rest.users.createDM(member.id)
             const msg = this.client.rest.channels.createMessage(dmChannel.id, {
@@ -72,7 +80,18 @@ export default class GlobalBanCommand extends Command {
                         });
                     });
 
-                    
+                    if(await manager.findOne(Bans, {
+                        where: {
+                            BanID: member.id
+                        }
+                    }) === null) {
+                        manager.save(Bans, {
+                            BanID: member.id,
+                            BanDate: Date.now(),
+                            BanReason: reason,
+                            BanLength: length
+                        });
+                    }
     
                     interaction.createMessage({
                         embeds: [
