@@ -30,7 +30,7 @@ export default class GlobalNickCommand extends Command {
     }
 
     public async interactionRun(interaction: CommandInteraction) {
-        if(interaction.member?.permissions.has("CHANGE_NICKNAME")){
+        if(interaction.member?.permissions.has("ADMINISTRATOR")){
             const member = interaction.data.options.getMentionable("user");
             const nick = interaction.data.options.getString("nickname");
     
